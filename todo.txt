@@ -1,4 +1,7 @@
+BidirectionalDijkstra - problema cu indexOf - in compute (mmeting)
+
 give a real world, practical example, that involves computing the Capacitated minimum spanning tree  (CMST) of a graph
+Enumerating all cycles in a graph/digraph (cycle/1975-johnson)
 
 ------------------------------------------------------------
 Maximum (Weighted) Independent Set / Clique / Vertex Cover

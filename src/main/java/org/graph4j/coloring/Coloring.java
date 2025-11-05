@@ -261,6 +261,27 @@ public class Coloring {
         return colorMap;
     }
 
+    /**
+     * Returns the vertices colored with a specified color.
+     *
+     * @param color a color number.
+     * @return the set of vertices colored with {@code color}.
+     */
+    public VertexSet getColorClass(int color) {
+        return getColorClasses().get(color);
+    }
+
+    /**
+     * Returns the vertices in the same color class with a vertex.
+     *
+     * @param v a vertex number.
+     * @return the vertices in the same color class with {@code v}, or
+     * {@code null} if {@code v} is not colored.
+     */
+    public VertexSet getVertexClass(int v) {
+        return getColorClass(getColor(v));
+    }
+
     //key=color, value = vertices colored with the color
     private void createColorClasses() {
         colorMap = new HashMap<>();

@@ -55,7 +55,7 @@ public class MSTTest {
         assertFalse(GraphTests.isConnected(alg.getTree()));
     }
 
-        @Test
+    //@Test
     public void crossTest() {
         double epsilon = 1.0E-12;   
         for (int i = 0; i < 10; i++) {

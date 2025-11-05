@@ -38,7 +38,6 @@ public class BFSTraverser {
     private BFSVisitor visitor;
     //
     private Queue<SearchNode> queue;
-    //private boolean inqueue[];
     private int orderIndex;
     private int compIndex;
     private SearchNode visited[];
@@ -59,7 +58,6 @@ public class BFSTraverser {
         int n = graph.numVertices();
         this.visited = new SearchNode[n];
         this.queue = new LinkedList<>();
-        //this.inqueue = new boolean[n];
         orderIndex = 0;
         compIndex = 0;
         maxLevel = -1;
@@ -96,10 +94,9 @@ public class BFSTraverser {
         init();
         this.visitor = visitor;
         try {
-            var node = new SearchNode(compIndex, start, 0, orderIndex++, null);
+            var node = new SearchNode(compIndex, start, 0, orderIndex++, null);            
             visited[graph.indexOf(start)] = node;
             queue.add(node);
-            //inqueue[graph.indexOf(node.vertex())] = true;
             //start traversing the first component, with the initial vertex
             bfs();
             for (int i = restartIndex, n = graph.numVertices(); i < n; i++) {
@@ -107,10 +104,9 @@ public class BFSTraverser {
                 if (visited[i] == null) {
                     //start traversing another connected component
                     compIndex++;
-                    node = new SearchNode(compIndex, graph.vertexAt(i), 0, orderIndex++, null);
+                    node = new SearchNode(compIndex, graph.vertexAt(i), 0, orderIndex++, null);                    
                     visited[i] = node;
                     queue.add(node);
-                    //inqueue[i] = true;
                     bfs();
                 }
             }
@@ -125,8 +121,6 @@ public class BFSTraverser {
         while (!queue.isEmpty()) {
             var node = queue.poll();
             int v = node.vertex();
-            int vi = graph.indexOf(v);
-            //inqueue[vi] = false;
             visitor.startVertex(node);
             if (maxLevel < node.level()) {
                 maxLevel = node.level();
@@ -139,7 +133,6 @@ public class BFSTraverser {
                     var child = new SearchNode(compIndex, u, node.level() + 1, orderIndex++, node);
                     visited[ui] = child;
                     queue.add(child);
-                    //inqueue[ui] = true;
                     visitor.treeEdge(node, child);
                     leaf = false;
                 } else {

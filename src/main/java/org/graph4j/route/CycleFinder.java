@@ -27,6 +27,7 @@ import org.graph4j.traversal.DFSTraverser;
 import org.graph4j.traversal.SearchNode;
 import org.graph4j.util.Validator;
 import org.graph4j.traversal.BFSVisitor;
+import org.graph4j.traversal.TraversalStrategy;
 
 /**
  * Algorithms for finding cycles in a directed or undirected graph.
@@ -41,6 +42,7 @@ public class CycleFinder extends GraphAlgorithm {
     private int parity;
     private boolean shortest;
     private boolean longer;
+    private TraversalStrategy strategy = TraversalStrategy.DFS;
 
     /**
      *
@@ -55,6 +57,7 @@ public class CycleFinder extends GraphAlgorithm {
         this.parity = -1;
         this.shortest = false;
         this.longer = false;
+        this.strategy = TraversalStrategy.DFS;
     }
 
     //cycles of length 1 or 2
@@ -100,7 +103,7 @@ public class CycleFinder extends GraphAlgorithm {
         if (cycle != null) {
             return cycle;
         }
-        if (shortest) {
+        if (strategy == TraversalStrategy.BFS) {
             return bfs();
         } else {
             return dfs();
@@ -108,6 +111,7 @@ public class CycleFinder extends GraphAlgorithm {
     }
 
     /**
+     * Checks if the graph contains a cycle.
      *
      * @return {@code true} if the graph contains a cycle.
      */
@@ -138,20 +142,36 @@ public class CycleFinder extends GraphAlgorithm {
     }
 
     /**
+     * Searches for a cycle passing through a specified vertex, using a DFS
+     * traversal.
      *
      * @param target a vertex number.
      * @return the first cycle found that passes through {@code target}, or
      * {@code null} if none exists.
      */
     public Cycle findAnyCycle(int target) {
+        return findAnyCycle(target, TraversalStrategy.DFS);
+    }
+
+    /**
+     * Searches for a cycle passing through a specified vertex, using a DFS or
+     * BFS traversal.
+     *
+     * @param target a vertex number.
+     * @param strategy DFS or BFS.
+     * @return the first cycle found that passes through {@code target}, or
+     * {@code null} if none exists.
+     */
+    public Cycle findAnyCycle(int target, TraversalStrategy strategy) {
         Validator.containsVertex(graph, target);
         reset();
         this.target = target;
+        this.strategy = strategy;
         return findCycle();
     }
 
     /**
-     * Uses BFS in order to find a cycle.
+     * Searches for the shortest cycle in the graph, using a BFS traversal.
      *
      * @return the shortest cycle in the graph, or {@code null} if the graph is
      * acyclic.
@@ -159,10 +179,13 @@ public class CycleFinder extends GraphAlgorithm {
     public Cycle findShortestCycle() {
         reset();
         this.shortest = true;
+        this.strategy = TraversalStrategy.BFS;
         return findCycle();
     }
 
     /**
+     * Searches for the shortest cycle passing through a specified vertex, using
+     * a BFS traversal.
      *
      * @param target a vertex number.
      * @return the shortest cycle in the graph that passes through
@@ -173,6 +196,7 @@ public class CycleFinder extends GraphAlgorithm {
         reset();
         this.target = target;
         this.shortest = true;
+        this.strategy = TraversalStrategy.BFS;
         return findCycle();
     }
 
@@ -268,7 +292,7 @@ public class CycleFinder extends GraphAlgorithm {
                 interrupt();
             }
         }
-        
+
         @Override
         public void treeEdge(SearchNode from, SearchNode to) {
             //finding the cycle before backEdge
@@ -296,7 +320,7 @@ public class CycleFinder extends GraphAlgorithm {
                     if (cycle == null || temp.size() > cycle.size()) {
                         cycle = temp;
                         if (cycle.size() == graph.numVertices() - 1) {
-                            //interrupt();
+                            interrupt();
                         }
                     }
                 } else {
@@ -320,7 +344,7 @@ public class CycleFinder extends GraphAlgorithm {
                 interrupt();
             }
         }
-        
+
         @Override
         public void backEdge(SearchNode from, SearchNode to) {
             //back edges are only for directed graphs
@@ -339,9 +363,14 @@ public class CycleFinder extends GraphAlgorithm {
             }
         }
 
+        //found a cycle
         private void analyze(Cycle temp) {
             if (parity >= 0 && temp.length() % 2 != parity) {
                 return;
+            }
+            if (!shortest) {
+                cycle = temp;
+                interrupt();
             }
             if (cycle == null || temp.length() < cycle.length()) {
                 cycle = temp;

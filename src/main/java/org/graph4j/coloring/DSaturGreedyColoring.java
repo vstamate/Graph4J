@@ -47,6 +47,10 @@ public class DSaturGreedyColoring extends GreedyColoringBase {
     public DSaturGreedyColoring(Graph graph) {
         super(graph);
     }
+    
+    public DSaturGreedyColoring(Graph graph, GreedyRecoloring recolor) {
+        super(graph, recolor);
+    }
 
     @Override
     protected void init() {

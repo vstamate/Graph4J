@@ -154,6 +154,7 @@ class DigraphImpl<V, E> extends GraphImpl<V, E> implements Digraph<V, E> {
 
     //incident from/to v
     //Improve as a bulk operation
+    //TODO: optimize!
     @Override
     protected void removeAllEdgesAt(int vi) {
         int v = vertices[vi];

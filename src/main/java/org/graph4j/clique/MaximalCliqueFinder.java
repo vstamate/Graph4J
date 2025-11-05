@@ -121,7 +121,7 @@ public class MaximalCliqueFinder extends SimpleGraphAlgorithm {
 
     /**
      * This method iterates over all maximal cliques of the graph, in order to
-     * find the maximum one.If it cannot finish in the alloted time, it returns
+     * find the maximum one. If it cannot finish in the alloted time, it returns
      * {@code null}.
      *
      * @param timeLimit a time limit in milliseconds (0 for no time limit).

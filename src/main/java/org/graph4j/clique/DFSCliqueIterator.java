@@ -115,10 +115,11 @@ public class DFSCliqueIterator extends SimpleGraphAlgorithm
             int v = node.cand.pop();
             var newClique = new Clique(node.clique);
             newClique.add(v);
-            var newCand = newClique.size() == maxSize ? null : neighbors(v, node.cand.vertices());
+            int newSize = newClique.size();
+            var newCand = newSize == maxSize ? null : neighbors(v, node.cand.vertices());
             stack.push(new Node(newClique, newCand));
 
-            if (newClique.size() >= minSize) {
+            if (newSize >= minSize) {
                 currentClique = newClique;
                 assert currentClique.isValid();
                 return true;
@@ -126,7 +127,6 @@ public class DFSCliqueIterator extends SimpleGraphAlgorithm
 
         }
         return false;
-
     }
 
     private class Node {

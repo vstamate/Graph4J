@@ -17,8 +17,6 @@
 package org.graph4j;
 
 import java.io.FileNotFoundException;
-import org.graph4j.generators.RandomGnpGraphGenerator;
-import org.graph4j.util.IntArrays;
 
 /**
  *
@@ -36,18 +34,6 @@ class Main {
     }
 
     private void test() {
-        try {
-            for (int i = 0; i < 100; i++) {
-                Digraph d = new RandomGnpGraphGenerator(100, 0.5).createDigraph();                
-                int[] vertices = IntArrays.shuffle(d.vertices());
-                for (int v : vertices) {
-                    d.removeVertex(v);
-                }
-                System.out.println(d);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     protected void run(Runnable snippet) {

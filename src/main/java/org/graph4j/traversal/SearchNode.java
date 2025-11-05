@@ -112,7 +112,7 @@ public class SearchNode {
      */
     public boolean isAncestorOf(SearchNode other) {
         while (other != null) {
-            if (this.equals(other)) {
+            if (this.vertex == other.vertex) {
                 return true;
             }
             other = other.parent;

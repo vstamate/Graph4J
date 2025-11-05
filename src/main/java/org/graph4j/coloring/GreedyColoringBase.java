@@ -38,6 +38,8 @@ public abstract class GreedyColoringBase extends SimpleGraphAlgorithm
     protected int[] colors; //the colors assigned to vertices
     protected BitSet used; // colors
     protected int numColors; //colors will be from [0..numColors-1]
+    protected int maxColor;
+    protected GreedyRecoloring recolor;
 
     /**
      *
@@ -45,6 +47,16 @@ public abstract class GreedyColoringBase extends SimpleGraphAlgorithm
      */
     public GreedyColoringBase(Graph graph) {
         super(graph);
+    }
+
+    /**
+     *
+     * @param graph the input graph.
+     * @param recolor the recoloring heuristic.
+     */
+    public GreedyColoringBase(Graph graph, GreedyRecoloring recolor) {
+        super(graph);
+        this.recolor = recolor;
     }
 
     @Override
@@ -60,6 +72,7 @@ public abstract class GreedyColoringBase extends SimpleGraphAlgorithm
         this.colors = new int[graph.numVertices()];
         Arrays.fill(colors, -1);
         this.used = new BitSet();
+        this.maxColor = -1;
         while (hasUncoloredVertices()) {
             int v = nextUncoloredVertex();
             //finding the colors used by the neighbors of v
@@ -72,16 +85,35 @@ public abstract class GreedyColoringBase extends SimpleGraphAlgorithm
             while (used.get(color) && color < numColors - 1) {
                 color++;
             }
-            if (color == numColors) {
-                return null;
+
+            //v is to be colored with col
+            //if col > number of used colors, apply a recoloring heuristic 
+            //in order to color v with a smaller color
+            if (color > maxColor) {
+                if (recolor != null) {
+                    int c = recolor.recolor(graph, v, colors);
+                    if (c >= 0) {
+                        color = c;
+                    }
+                }
+                if (color == numColors) {
+                    return null;
+                }
             }
             colors[graph.indexOf(v)] = color;
             used.clear();
             update(v);
+            if (color > maxColor) {
+                maxColor = color;
+            }
         }
         var coloring = new Coloring(graph, colors);
         assert isValid(coloring);
         return coloring;
+    }
+
+    protected int repair(int v) {
+        return -1;
     }
 
     //by default, it marks the color of u

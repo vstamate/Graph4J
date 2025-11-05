@@ -128,10 +128,11 @@ class DFSBoundedCliqueIterator extends SimpleGraphAlgorithm
             var newClique = new Clique(node.clique);
             newClique.add(v);
             double newWeight = node.weight + graph.getVertexWeight(v);
-            var newCand = newClique.size() == maxSize ? null : neighbors(v, node.cand.vertices(), newWeight);
+            int newSize = newClique.size();
+            var newCand = newSize == maxSize ? null : neighbors(v, node.cand.vertices(), newWeight);
             stack.push(new Node(newClique, newCand, newWeight));
 
-            if (newClique.size() >= minSize) {
+            if (newSize >= minSize) {
                 currentClique = newClique;
                 assert currentClique.isValid();
                 return true;

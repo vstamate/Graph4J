@@ -39,6 +39,7 @@ public class VertexHeap implements Iterable<Integer> {
     private int size;
 
     /**
+     * Creates a new heap containing all graph vertices.
      *
      * @param graph the graph the vertices of the heap belong to.
      * @param comparator a comparator for vertices.
@@ -48,6 +49,8 @@ public class VertexHeap implements Iterable<Integer> {
     }
 
     /**
+     *
+     * Creates a new heap containing either all graph vertices or none.
      *
      * @param graph the graph the vertices of the heap belong to.
      * @param comparator a comparator for vertices.
@@ -152,7 +155,7 @@ public class VertexHeap implements Iterable<Integer> {
         siftDown(1);
         return top;
     }
-
+    
     /**
      * Removes a specified key from the heap.
      *

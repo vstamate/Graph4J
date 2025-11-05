@@ -38,6 +38,14 @@ public class StableSet extends VertexSet {
         super(graph, vertices);
     }
 
+    /**
+     *
+     * @param other a vertex set.
+     */
+    public StableSet(VertexSet other) {
+        super(other);
+    }
+
     protected void checkEdge(int v, int u) {
         if (v == u) {
             return;

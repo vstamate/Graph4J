@@ -162,6 +162,13 @@ public class TarjanStrongConnectivity
         }
 
         @Override
+        public void upward(SearchNode from, SearchNode to) {
+            int vi = graph.indexOf(from.vertex());
+            int ui = graph.indexOf(to.vertex());
+            low[ui] = Math.min(low[ui], low[vi]);
+        }
+
+        @Override
         public void finishVertex(SearchNode node) {
             int v = node.vertex();
             int vi = graph.indexOf(v);
@@ -169,14 +176,7 @@ public class TarjanStrongConnectivity
                 createComponent(v);
             }
         }
-
-        @Override
-        public void upward(SearchNode from, SearchNode to) {
-            int vi = graph.indexOf(from.vertex());
-            int ui = graph.indexOf(to.vertex());
-            low[ui] = Math.min(low[ui], low[vi]);
-        }
-
+        
         private void createComponent(int u) {
             //u and the vertices on the stack up to u form a component
             if (stronglyConnected == null && !compSets.isEmpty()) {

@@ -39,7 +39,7 @@ import org.graph4j.util.VertexSet;
  *
  * @author Cristian Frăsinaru
  */
-public class StoerWagnerMinimumCut2 extends SimpleGraphAlgorithm {
+class StoerWagnerMinimumCut2 extends SimpleGraphAlgorithm {
 
     private boolean ignoreWeights;
     private Graph workGraph;

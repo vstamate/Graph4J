@@ -56,6 +56,16 @@ public class IntArrays {
     }
 
     /**
+     * Returns the sum of the values in an array.
+     *
+     * @param array an array of integers.
+     * @return the sum of values in the array.
+     */
+    public static int sum(int[] array) {
+        return Arrays.stream(array).sum();
+    }
+
+    /**
      *
      * @param array an array of integers.
      * @return a copy of the array.

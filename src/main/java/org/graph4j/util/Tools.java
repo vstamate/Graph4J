@@ -17,9 +17,9 @@
 package org.graph4j.util;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
@@ -176,12 +176,13 @@ public class Tools {
 
     /**
      *
-     * @param str a string.
+     * @param obj an object.
      * @param length a length.
      * @return the string padded with spaces to the left such that it has the
      * specified length.
      */
-    public static String padLeft(String str, int length) {
+    public static String padLeft(Object obj, int length) {
+        var str = obj.toString();
         if (str.length() >= length) {
             return str;
         }
@@ -195,12 +196,13 @@ public class Tools {
 
     /**
      *
-     * @param str a string.
+     * @param obj an object.
      * @param length a length.
      * @return the string padded with spaces to the right such that it has the
      * specified length.
      */
-    public static String padRight(String str, int length) {
+    public static String padRight(Object obj, int length) {
+        var str = obj.toString();
         if (str.length() >= length) {
             return str;
         }
@@ -242,6 +244,57 @@ public class Tools {
             array[i] = array[j];
             array[j] = temp;
         }
+    }
+
+    /**
+     * Rounds a real number to 2 decimal places.
+     *
+     * @param number a real number.
+     * @return the number rounded to 2 decimal places.
+     */
+    public static double round(double number) {
+        return Math.round(number * 100d) / 100d;
+    }
+
+    /**
+     * Computes the factorial of a non-negative integer.
+     *
+     * @param n The non-negative integer for which to calculate the factorial.
+     * @return The factorial of {@code n}.
+     * @throws IllegalArgumentException If {@code n} is negative.
+     */
+    public static BigInteger factorial(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Factorial is not defined for negative numbers.");
+        }
+        BigInteger result = BigInteger.ONE;
+        for (int i = 2; i <= n; i++) {
+            result = result.multiply(BigInteger.valueOf(i));
+        }
+        return result;
+    }
+
+    /**
+     * Computes the number of combinations of choosing {@code k} items from a
+     * set of {@code n} items without regard to the order of selection. This is
+     * often denoted as "n choose k" or $\binom{n}{k}$.
+     *
+     * @param n The total number of items in the set. Must be non-negative.
+     * @param k The number of items to choose from the set. Must be non-negative
+     * and less than or equal to {@code n}.
+     * @return The number of possible combinations. Returns 0 if {@code k} is
+     * negative or greater than {@code n}.
+     */
+    public static long combinations(int n, int k) {
+        if (k < 0 || k > n) {
+            return 0;
+        }
+        if (k > n / 2) {
+            k = n - k;
+        }
+        BigInteger numerator = factorial(n);
+        BigInteger denominator = factorial(k).multiply(factorial(n - k));
+        return numerator.divide(denominator).longValue();
     }
 
 }

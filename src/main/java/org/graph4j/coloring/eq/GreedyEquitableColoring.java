@@ -22,7 +22,7 @@ import org.graph4j.Graph;
 import org.graph4j.SimpleGraphAlgorithm;
 import org.graph4j.util.VertexSet;
 import org.graph4j.coloring.Coloring;
-import org.graph4j.coloring.ColoringAlgorithm;
+import org.graph4j.coloring.RecursiveLargestFirstColoring;
 
 /**
  * Creates an equitable coloring in a greedy manner. The algorithm starts with a
@@ -39,7 +39,8 @@ public class GreedyEquitableColoring extends SimpleGraphAlgorithm
     private int numColors;
 
     public GreedyEquitableColoring(Graph graph) {
-        this(graph, ColoringAlgorithm.getInstance(graph).findColoring());
+        //this(graph, ColoringAlgorithm.getInstance(graph).findColoring());
+        this(graph, new RecursiveLargestFirstColoring(graph).findColoring());         
     }
 
     /**

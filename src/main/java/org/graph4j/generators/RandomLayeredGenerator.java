@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.DoubleFunction;
-import java.util.function.ToDoubleFunction;
 import org.graph4j.Graph;
 import org.graph4j.GraphBuilder;
 import org.graph4j.util.WorkInProgress;
@@ -47,7 +46,7 @@ public class RandomLayeredGenerator extends AbstractGraphGenerator {
      * @param maxVerticesLayer maximum number of vertices per layer.
      * @param intraLayerEdgeProbability the probability of an intra-layer edge.
      * @param interLayerEdgeProbability the probability of an inter-layer edge.
-     * @param interLayerDecrease
+     * @param interLayerDecrease a function to reduce the interLayerProbability.
      */
     public RandomLayeredGenerator(int numLayers, int minVerticesLayer, int maxVerticesLayer,
             double intraLayerEdgeProbability, double interLayerEdgeProbability,

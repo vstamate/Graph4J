@@ -16,14 +16,12 @@
  */
 package org.graph4j.connectivity;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.graph4j.Graph;
 import org.graph4j.GraphTests;
 import org.graph4j.SimpleGraphAlgorithm;
 import org.graph4j.generators.EdgeWeightsGenerator;
-import org.graph4j.measures.GraphMeasures;
 import org.graph4j.util.IntHashMap;
 import org.graph4j.util.VertexHeap;
 import org.graph4j.util.VertexList;
@@ -41,7 +39,7 @@ import org.graph4j.util.VertexList;
  *
  * @author Cristian Frăsinaru
  */
-public class StoerWagnerMinimumCut1 extends SimpleGraphAlgorithm {
+class StoerWagnerMinimumCut1 extends SimpleGraphAlgorithm {
 
     private boolean ignoreWeights;
     private Graph workGraph;
