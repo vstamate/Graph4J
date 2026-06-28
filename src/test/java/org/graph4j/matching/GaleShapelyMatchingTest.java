@@ -2,52 +2,70 @@ package org.graph4j.matching;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.graph4j.Graph;
 import org.graph4j.GraphBuilder;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class GaleShapelyMatchingTest {
 
-    @Test
-    void testAlgorithm() {
-        int n = 6;
-
-        Graph graph = GraphBuilder.empty()
-                .estimatedNumVertices(n * 2)
-                .buildDigraph();
-
-        for (var i = 0; i < n * 2; i++) {
-            graph.addLabeledVertex(i, i);
-        }
-
-        var preferences = List.of(
-                List.of(8, 6, 9, 7, 11, 10),
-                List.of(11, 7, 6, 9, 8, 10),
-                List.of(9, 7, 11, 8, 10, 6),
-                List.of(9, 6, 7, 11, 10, 8),
-                List.of(6, 9, 10, 7, 11, 8),
-                List.of(10, 7, 6, 11, 8, 9),
-                List.of(3, 2, 0, 4, 5, 1),
-                List.of(1, 5, 2, 3, 0, 4),
-                List.of(0, 4, 3, 2, 5, 1),
-                List.of(3, 0, 1, 4, 5, 2),
-                List.of(2, 5, 1, 0, 3, 4),
-                List.of(4, 5, 3, 1, 0, 2)
-        );
-
-        for (var i = 0; i < n * 2; i++) {
-            var preference = preferences.get(i);
-
-            for (var j = 0; j < n; j++) {
-                graph.addEdge(i, preference.get(j), j);
-            }
-        }
-
+    @ParameterizedTest
+    @MethodSource("testProvider")
+    void testAlgorithm(int n, Graph graph, String expected) {
         var galeShapelyAlgorithm = new GaleShapelyMatching(graph);
         var matching = galeShapelyAlgorithm.getMatching();
 
-        assertEquals(6, matching.size());
-        assertEquals("", matching.toString());
+        assertEquals(n, matching.size());
+        assertEquals(expected, matching.toString());
+    }
+
+    static Stream<Arguments> testProvider() throws Exception {
+        var resourceRoot = Path.of(GaleShapelyMatchingTest.class.getResource("/galeshapely").toURI());
+        var files = Files.list(resourceRoot)
+                .filter(Files::isRegularFile)
+                .map(Path::toFile)
+                .collect(Collectors.toList());
+
+        return files.stream()
+                .map(testFile -> {
+                    try (var scanner = new Scanner(testFile)) {
+                        int n = Integer.parseInt(scanner.nextLine());
+
+                        Graph graph = GraphBuilder.empty()
+                                .estimatedNumVertices(n * 2)
+                                .buildDigraph();
+
+                        for (var i = 0; i < n * 2; i++) {
+                            graph.addLabeledVertex(i, i);
+                        }
+
+                        for (int i = 0; i < n * 2; i++) {
+                            var line = scanner.nextLine();
+                            var rawPreferences = line.split(" ");
+
+                            var preference = Stream.of(rawPreferences)
+                                    .map(Integer::parseInt)
+                                    .collect(Collectors.toList());
+
+                            for (var j = 0; j < n; j++) {
+                                graph.addEdge(i, preference.get(j), j);
+                            }
+
+                        }
+
+                        String expected = scanner.nextLine();
+
+                        return Arguments.of(n, graph, expected);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 }

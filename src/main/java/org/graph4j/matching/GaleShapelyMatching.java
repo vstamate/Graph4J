@@ -39,7 +39,7 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
     public GaleShapelyMatching(Graph graph) {
         super(graph);
         verifyGraph(graph);
-        comparator = (Edge e1, Edge e2) -> (int) Math.signum(e2.weight() - e1.weight());
+        comparator = (Edge e1, Edge e2) -> (int) Math.signum(e1.weight() - e2.weight());
 
         n = graph.numVertices() / 2;
 
