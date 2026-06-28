@@ -20,9 +20,9 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
     private final int n;
     private final Edge[][] preferences;
 
-    private final boolean[][] leftSideProposals;
-    private final boolean[] rightSideAvailable;
-    private final int marriedTo[];
+    private final boolean[][] proposals;
+    private final boolean[] availability;
+    private final int rawMatching[];
 
     /*
     * Resources:
@@ -44,22 +44,17 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
         n = graph.numVertices() / 2;
 
         preferences = new Edge[n * 2][n * 2];
-        leftSideProposals = new boolean[n][n];
-        rightSideAvailable = new boolean[n]; // to modify
-        marriedTo = new int[n];
-
-        for (int i = 0; i < n; i++) {
-            rightSideAvailable[i] = true;
-            marriedTo[i] = 0;
-        }
+        proposals = new boolean[n * 2][n * 2]; // I could improve this by focusing on left side only
+        availability = new boolean[n * 2]; // same here
+        rawMatching = new int[n * 2];
 
         for (int i = 0; i < n * 2; i++) {
             var pref = Arrays.copyOf(graph.edgesOf(i), n);
-            System.out.println(Arrays.toString(pref));
             Arrays.sort(pref, comparator);
-            System.out.println("yo");
 
             preferences[i] = pref;
+            availability[i] = true;
+            rawMatching[i] = -1;
         }
     }
 
@@ -129,68 +124,69 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
 
         matching = new Matching(graph);
 
-        var mList = new LinkedList<Integer>();
+        var freeM = new LinkedList<Integer>();
 
         for (int i = 0; i < n; i++) {
-            mList.add(i);
+            freeM.add(i);
         }
 
-        while (!mList.isEmpty()) {
-            int m = mList.pop();
-            int w = getFirstUnproposedPreference(m);
+        while (!freeM.isEmpty()) {
+            int m = freeM.pop();
+            int w = getFirstUnproposed(m);
 
             if (w == -1) {
                 continue;
             }
 
-            leftSideProposals[m][w] = true;
-            rightSideAvailable[w] = false;
+            proposals[m][w] = true;
 
-            if (rightSideAvailable[w]) {
-                marriedTo[m] = w;
+            if (availability[w]) {
+                engage(m, w);
             } else {
-                int mp = otherPairForF(w);
+                int mp = rawMatching[w];
 
-                if (mp != -1) {
-                    if (fPrefersThisMate(w, m, mp)) {
-                        marriedTo[mp] = -1;
-                        mList.push(mp);
-                        marriedTo[m] = w;
-                    } else {
-                        mList.push(m);
-                    }
+                if (wPrefersMoverMp(w, m, mp)) {
+                    rawMatching[mp] = -1;
+
+                    engage(m, w);
+
+                    freeM.push(mp);
+                } else {
+                    freeM.push(m);
                 }
             }
 
         }
 
-        System.out.println(Arrays.toString(marriedTo));
+        for (int i = 0; i < n; i++) {
+            matching.add(i, rawMatching[i]);
+        }
 
         return matching;
     }
 
-    private int getFirstUnproposedPreference(int m) {
-        for (int i = 0; i < n; i++) {
-            if (!leftSideProposals[m][i]) {
-                return i;
+    private void engage(int m, int w) {
+        rawMatching[m] = w;
+        rawMatching[w] = m;
+        availability[w] = false;
+    }
+
+    private int getFirstUnproposed(int m) {
+        var preferences = this.preferences[m];
+
+        for (var preference : preferences) {
+            var w = preference.target();
+
+            if (!proposals[m][w]) {
+                return w;
             }
         }
 
         return -1;
     }
 
-    private int otherPairForF(int f) {
-        for (int i = 0; i < n; i++) {
-            if (marriedTo[i] == f) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    private boolean fPrefersThisMate(int f, int m, int mp) {
-        Edge[] preferences = this.preferences[f];
+    private boolean wPrefersMoverMp(int w, int m, int mp) {
+        var preferences = this.preferences[w];
 
         for (int i = 0; i < n; i++) {
             if (preferences[i].target() == m) {

@@ -30,7 +30,7 @@ class GaleShapelyMatchingTest {
                 List.of(10, 7, 6, 11, 8, 9),
                 List.of(3, 2, 0, 4, 5, 1),
                 List.of(1, 5, 2, 3, 0, 4),
-                List.of(5, 4, 3, 2, 0, 1),
+                List.of(0, 4, 3, 2, 5, 1),
                 List.of(3, 0, 1, 4, 5, 2),
                 List.of(2, 5, 1, 0, 3, 4),
                 List.of(4, 5, 3, 1, 0, 2)
@@ -45,7 +45,9 @@ class GaleShapelyMatchingTest {
         }
 
         var galeShapelyAlgorithm = new GaleShapelyMatching(graph);
+        var matching = galeShapelyAlgorithm.getMatching();
 
-        assertEquals(6, galeShapelyAlgorithm.getMatching().size());
+        assertEquals(6, matching.size());
+        assertEquals("", matching.toString());
     }
 }
