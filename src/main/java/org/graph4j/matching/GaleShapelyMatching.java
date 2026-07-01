@@ -12,30 +12,49 @@ import org.graph4j.GraphAlgorithm;
 import org.graph4j.InvalidVertexException;
 import org.graph4j.util.Matching;
 
+/**
+ * Implements the <a href="https://en.wikipedia.org/wiki/Gale%E2%80%93Shapley_algorithm">Gale-Shapely algorithm</a>.
+ * The input is represented by a bipartite graph <code>G = (U, V)</code> where each vertex has edges with all vertexes to
+ * the counterpart set. The preferences have a cost associated such that a vertex from <code>U</code>
+ * and <code>V</code> have a clear preference order where ties aren't allowed.
+ * <p></p>
+ * Resources:
+ * <ul>
+ *     <li><a href="https://en.wikipedia.org/wiki/Gale%E2%80%93Shapley_algorithm">Gale-Shapely algorithm from Wikipedia</a></li>
+ *     <li><a href="https://medium.com/data-science/gale-shapley-algorithm-simply-explained-caa344e643c2">Gale-Shapely algorithm explained</a></li>
+ *     <li><a href="https://www.youtube.com/watch?v=UHjh_0F0CSk">Explication video of the algorithm</a></li>
+ * </ul>
+ * <p></p>
+ * Returns a {@link Matching} with each pairing.
+*/
 public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgorithm {
 
     private Matching matching;
     private Comparator<Edge> comparator;
 
     private final int n;
+    /**
+     * The matrix of preferences. For <code>x ε (U ∪ V)</code> <code>preference[x]</code> returns the preference of <code>x</code>
+     * over the counterpart set.
+     */
     private final Edge[][] preferences;
 
-    private final boolean[][] proposals;
-    private final boolean[] availability;
-    private final int rawMatching[];
-
-    /*
-    * Resources:
-    * * https://medium.com/data-science/gale-shapley-algorithm-simply-explained-caa344e643c2
-    * * https://www.youtube.com/watch?v=UHjh_0F0CSk
-    * * https://en.wikipedia.org/wiki/Gale%E2%80%93Shapley_algorithm
-    * */
-
     /**
-     * =================== TODO DOCUMENTATION ===================
-     *
-     * @param graph the input graph.
+     * The matrix of proposals. Used to check if <code>m ε U</code> proposed to <code>w ε V</code>.
      */
+    private final boolean[][] proposals;
+    /**
+     * The availability for each <code>w ε V</code>. When <code>availability[w]</code> is true, it means <code>w</code>
+     * is already matched with a <code>m ε U</code>.
+     */
+    private final boolean[] availability;
+    /**
+     * A raw representation of the matchings used for both <code>m ε U</code> and <code>w ε V</code>. The initial value
+     * for each vertex is <code>-1</code>, then each <code>x ε (U ∪ V)</code> is populated with the pairing from the
+     * counterpart set and for each matching: <code>rawMatching[m] = w</code> and <code>rawMatching[w] = m</code>.
+     */
+    private final int[] rawMatching;
+
     public GaleShapelyMatching(Graph graph) {
         super(graph);
         verifyGraph(graph);
@@ -58,6 +77,16 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
         }
     }
 
+    /**
+     * Verifies that the given graph is valid with the constraints required. It checks for the following:
+     * <ul>
+     *     <li>an even number of vertexes</li>
+     *     <li><code>U</code> and <code>V</code> to have the same cardinality</li>
+     *     <li>each vertex to have preferences with no ties over all the vertexes from the counterpart set</li>
+     * </ul>
+     *
+     * @throws InvalidVertexException if at least one constraint is not met
+     */
     private void verifyGraph(Graph graph) {
         if (graph.numVertices() % 2 != 0) {
             throw new InvalidVertexException("Invalid number of vertexes");
@@ -113,8 +142,9 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
     }
 
     /**
-     * ===== TODO DOCUMENTATION =====
-     * @return the maximum cardinality matching.
+     * Runs the Gale-Shapely algorithm.
+     *
+     * @return a matching between the two sets based on preferences.
      */
     @Override
     public Matching getMatching() {
@@ -165,12 +195,18 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
         return matching;
     }
 
+    /**
+     * Marks <code>m ε U</code> and <code>w ε V</code> as engaged.
+     */
     private void engage(int m, int w) {
         rawMatching[m] = w;
         rawMatching[w] = m;
         availability[w] = false;
     }
 
+    /**
+     * Returns the first <code>w ε V</code> that <code>m ε U</code> did not proposed to.
+     */
     private int getFirstUnproposed(int m) {
         var preferences = this.preferences[m];
 
@@ -185,6 +221,9 @@ public class GaleShapelyMatching extends GraphAlgorithm implements MatchingAlgor
         return -1;
     }
 
+    /**
+     * Checks whether <code>w ε V</code> prefers <code>m ε U</code> over <code>m' ε U</code>.
+     */
     private boolean wPrefersMoverMp(int w, int m, int mp) {
         var preferences = this.preferences[w];
 
